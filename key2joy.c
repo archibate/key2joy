@@ -28,21 +28,40 @@ void readkeys(int fd2) {
     struct input_event ie;
     while (read(fd2, &ie, sizeof(ie)) == sizeof(ie)) {
         if (ie.type == EV_KEY && ie.code <= KEY_CNT) {
-            printf("%d: %d\n", ie.code, ie.value);
+            /*printf("%d: %d\n", ie.code, ie.value); fflush(stdout);*/
             pressed[ie.code] = ie.value;
         }
     }
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
     /*setvbuf(stdin, NULL, _IONBF, 0);*/
     /*setvbuf(stdout, NULL, _IONBF, 0);*/
 
-    int fd2 = open("/dev/input/event12", O_RDONLY | O_NONBLOCK);
+    if (argc <= 1) {
+        fprintf(stderr, "Usage: sudo %s /dev/input/event[N]\n", argv[0]);
+        fprintf(stderr, "Where [N] is your event id of the input keyboard\n");
+        fprintf(stderr, "To find event id, use: cat /proc/bus/input/devices\n");
+        // e.g. my keyboard is event5
+        //I: Bus=0003 Vendor=258a Product=1006 Version=0111
+        //N: Name="Gaming KB  Gaming KB "
+        //P: Phys=usb-0000:00:14.0-1/input0
+        //S: Sysfs=/devices/pci0000:00/0000:00:14.0/usb1/1-1/1-1:1.0/0003:258A:1006.0001/input/input5
+        //U: Uniq=
+        //H: Handlers=sysrq kbd leds event5
+        //B: PROP=0
+        //B: EV=120013
+        //B: KEY=1000000000007 ff9f207ac14057ff febeffdfffefffff fffffffffffffffe
+        //B: MSC=10
+        //B: LED=7
+        return -1;
+    }
+
+    int fd2 = open(argv[1], O_RDONLY | O_NONBLOCK);
     if (fd2 < 0) {
-        perror("/dev/input/event12");
-        fprintf(stderr, "Hint: cat /proc/bus/input/devices\n");
+        perror(argv[1]);
+        fprintf(stderr, "Hint: sudo %s\n", argv[0]);
         return -1;
     }
 

@@ -1,3 +1,4 @@
 [+]
 build_target=key2joy
 run_environ=sudo
+run_args=/dev/input/event5
